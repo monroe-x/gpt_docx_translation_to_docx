@@ -1,12 +1,44 @@
+# 导入需要的库
 from docx import Document
 from docx.shared import Pt
 import openai
 import threading
 import time
 
-# 设置OpenAI API
-openai.api_key = ""
-# openai.api_base = ""
+
+
+
+
+
+# 获取用户输入的API key
+api_key = input("请输入API key: ")
+
+# 尝试获取用户输入的base URL，如果没有则使用默认值
+base_url_input = input("请输入base URL (如果没有，请直接回车): ")
+base_url = base_url_input if base_url_input else "https://api.openai.com"
+
+# 获取用户输入的线程数
+xian_cheng_int = int(input("请输入线程数（线程数越多，单位时间内翻译的段落越多）: "))
+
+# 根据用户输入创建client实例
+if base_url_input:  # 如果用户输入了base URL
+    client = openai.OpenAI(api_key=api_key, base_url=base_url)
+else:  # 如果用户没有输入base URL，使用默认的构造函数
+    client = openai.OpenAI(api_key=api_key)
+
+print("客户端配置完成。")
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def get(j,number_paragraph):
@@ -20,18 +52,19 @@ def get(j,number_paragraph):
 
     # 创建一个对话列表
     message = [
-        {"role": "system", "content": "Translate the following English (or other languages) into Chinese."},
-        {"role": "user", "content": f"{one_paragraph_text}"}
+        {"role": "system", "content": f"""Translate the following English (or other languages) into Chinese.If there is no text to translate, please copy the user's input as a reply.text:"{one_paragraph_text} " """}
     ]
+
+
 
     try:
         # 使用GPT-3.5对话模型进行翻译
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # 使用GPT-3.5版本
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=message
         )
-
-        print(response.choices[0].message['content'])
+        # print(response)
+        print(response.choices[0].message.content)
 
         with lock:
             # 获取第一段的第一个字符的字体大小
@@ -43,7 +76,7 @@ def get(j,number_paragraph):
             one_paragraph.clear()
 
             # 修改内容
-            new_content = one_paragraph.add_run(response.choices[0].message['content'])  # 添加新的内容
+            new_content = one_paragraph.add_run(response.choices[0].message.content)  # 添加新的内容
 
             # 设置字体大小
             if font_size:  # 判断是否获取到字体大小
@@ -64,7 +97,7 @@ def get(j,number_paragraph):
 lock = threading.Lock()
 
 
-file = input("文件名：")
+file = input("当前文件夹的docx文件名（无后缀）：")
 print(file)
 
 # 打开已有的docx文件
@@ -90,7 +123,7 @@ my_json_data = {
 while True: 
     # 检测列表的元素数是否超过100
     while True:
-        if len(my_json_data['ingT']) > 100:  # 检查长度是否大于100
+        if len(my_json_data['ingT']) > xian_cheng_int:  # 检查线程是否大于100
             print("超过100线程")
             print("当前线程数：",len(my_json_data['ingT']))
             time.sleep(1)

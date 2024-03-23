@@ -124,11 +124,11 @@ while True:
     # 检测列表的元素数是否超过100
     while True:
         if len(my_json_data['ingT']) > xian_cheng_int:  # 检查线程是否大于100
-            print("超过100线程")
+            print(f"超过{xian_cheng_int}线程")
             print("当前线程数：",len(my_json_data['ingT']))
             time.sleep(1)
         else:
-            print("未超过100线程")
+            print(f"未超过{xian_cheng_int}线程")
             print("当前线程数：",len(my_json_data['ingT']))
             break
     

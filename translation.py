@@ -15,16 +15,15 @@ api_key = input("请输入API key: ")
 
 # 尝试获取用户输入的base URL，如果没有则使用默认值
 base_url_input = input("请输入base URL (如果没有，请直接回车): ")
-base_url = base_url_input if base_url_input else "https://api.openai.com"
-
-# 获取用户输入的线程数
-xian_cheng_int = int(input("请输入线程数（线程数越多，单位时间内翻译的段落越多）: "))
 
 # 根据用户输入创建client实例
 if base_url_input:  # 如果用户输入了base URL
-    client = openai.OpenAI(api_key=api_key, base_url=base_url)
+    client = openai.OpenAI(api_key=api_key, base_url=base_url_input)
 else:  # 如果用户没有输入base URL，使用默认的构造函数
     client = openai.OpenAI(api_key=api_key)
+
+# 获取用户输入的线程数
+xian_cheng_int = int(input("请输入线程数（线程数越多，单位时间内翻译的段落越多）（若出现故障/api限流问题，优先使用1个线程）: "))
 
 print("客户端配置完成。")
 
@@ -123,12 +122,12 @@ my_json_data = {
 while True: 
     # 检测列表的元素数是否超过100
     while True:
-        if len(my_json_data['ingT']) > xian_cheng_int:  # 检查线程是否大于100
-            print(f"超过{xian_cheng_int}线程")
+        if len(my_json_data['ingT']) >= xian_cheng_int:  # 检查线程是否大于100
+            print(f"达到{xian_cheng_int}线程")
             print("当前线程数：",len(my_json_data['ingT']))
             time.sleep(1)
         else:
-            print(f"未超过{xian_cheng_int}线程")
+            print(f"未达到{xian_cheng_int}线程")
             print("当前线程数：",len(my_json_data['ingT']))
             break
     
